@@ -71,7 +71,7 @@ catplot <- function(xs, ys,
 		points(x=xscale, y=yscale, col=linecolor, type="l")
 	}
 	rasterImage(imgMod, xscale-(size/2), yscale-(size/2), xscale+(size/2), yscale+(size/2), interpolate=TRUE)
-	list(xs=x, ys=y, args=args, canvas=canvas)
+	list(xs=xs, ys=ys, args=args, canvas=canvas)
 }
 
 
@@ -118,8 +118,39 @@ cats <- function(obj=NULL, xs, ys, size=0.1, cat=1, catcolor = c(0,0,0,1),
 	}
 	rasterImage(imgMod, xscale-(size/2), yscale-(size/2),
 	            xscale+(size/2), yscale+(size/2), interpolate=TRUE)
+	#cats now returns a catplot object so that cat data can be added sequentially
+	list(xs=obj$xs, ys=obj$ys, args=obj$args, canvas=obj$canvas)
 }
 
+
+catLegend<-function(obj, xl, yl, cat, size, catcolor, legend, legloc="right", ...) {
+  if(is.null(obj)) {
+    print("Feed the cats - cat obj is null")
+  }
+  args<-list(...)
+  
+  img<-catdat[[cat]]
+  dims<-dim(img)[1:2]
+  AR<-dims[1]/dims[2]
+  
+  scaledData<-catsScaleData(obj, xl, yl)
+  xscale<-scaledData$xscale
+  yscale<-scaledData$yscale
+  
+  imgMod<-colorMod(img, catcolor)
+  
+  rasterImage(imgMod, xscale-(size/2), yscale-(size/2),
+              xscale+(size/2), yscale+(size/2), interpolate=TRUE)
+  
+  if (legloc=="right"){
+    letx=xscale+(size/2)+0.1
+    lety=yscale
+    text(x=letx, y=lety, labels=legend)
+  }
+  else {
+    print("add other legloc values")
+  }
+}
 
 colorMod <- function(img, colorVec=c(0,0,0,1)) {
 	# the cat pngs are 72x72x4, where each of those 4 layers
